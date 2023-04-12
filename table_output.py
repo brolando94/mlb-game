@@ -47,17 +47,18 @@ if not path.exists(file_path):
 current_game = pd.read_excel(file_path, dtype=str).replace({np.nan: None})
 
 current_game_style = current_game.style \
-    .set_table_styles([{'selector': ' , td',
+    .apply(zebra_stripe, axis=None) \
+    .set_table_styles([{'selector': 'td',
                         'props': 'border: 2px solid black; border-collapse: collapse'},
                        {'selector': 'thead, th',
                         'props': 'background-color: #D3D3D3; color: black; '
                         'border-right: 2px solid black; '
                         'border-collapse: collapse; '
-                        'padding: 5px'}
+                        'padding: 15px'}
                        ]) \
-    .apply(zebra_stripe, axis=None)\
-    .set_properties(padding='5px')
+    .set_properties(**{'padding': '15px', 'border': '2px solid black', 'border-collapse': 'collapse'})
 
+current_game_style.to_excel(file_path, index=False)
 current_game_html = current_game_style.hide(axis='index').to_html().replace('None', '')
 
 # body for email
