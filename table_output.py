@@ -50,8 +50,8 @@ current_game_style = current_game.style \
     .set_table_styles([{'selector': ' , td',
                         'props': 'border: 2px solid black; border-collapse: collapse'},
                        {'selector': 'thead, th',
-                        'props': 'background-color: black; color: white; '
-                        'border-right: 1px solid white; '
+                        'props': 'background-color: #D3D3D3; color: black; '
+                        'border-right: 2px solid black; '
                         'border-collapse: collapse; '
                         'padding: 5px'}
                        ]) \
