@@ -13,10 +13,6 @@ import pandas as pd
 import numpy as np
 from os import path
 from datetime import date
-from dod_emailer import emailer as email
-from dotenv import load_dotenv
-from os import environ as env
-from pathlib import Path
 
 
 def zebra_stripe(data):
@@ -25,14 +21,6 @@ def zebra_stripe(data):
     z = pd.DataFrame(np.where(s, 'background-color:#D1D1D1', ''), index=data.index, columns=data.columns)
     return z
 
-
-# environment variables
-load_dotenv(fr'{Path.home()}\vars.env')
-
-email_credentials = {
-    "host": f"{env.get('email_host')}", "port": f"{env.get('email_port')}", "login": f"{env.get('email')}",
-    'pwd': f"{env.get('email_pwd')}", "sender": f"{env.get('email_sender')}"
-}
 
 # email information
 subject = f'MLB Game {date.today()}'
@@ -77,6 +65,3 @@ html = f"""\
         """
 
 # send email
-email.send_email(subject=subject, body=html, body_type='html', credentials=email_credentials,
-                 receivers=receivers, attachment_paths=[file_path]
-                 )
