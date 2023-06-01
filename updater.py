@@ -17,7 +17,7 @@ import numpy as np
 from os import path
 
 # how many days back you want to run. Ideally you set it to run everyday pulling yesterdays scores
-yesterday = str(date.today() - timedelta(days=0))
+yesterday = str(date.today() - timedelta(days=1))
 
 # game files path
 game_path = path.dirname(path.abspath(__file__)) + '/game_files/'
