@@ -34,6 +34,8 @@ if not path.exists(file_path):
 
 current_game = pd.read_excel(file_path, dtype=str).replace({np.nan: None})
 
+current_game['total'] = current_game['total'].astype('int')
+
 current_game_style = current_game.style \
     .apply(zebra_stripe, axis=None) \
     .set_table_styles([{'selector': 'td',

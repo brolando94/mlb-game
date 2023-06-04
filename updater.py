@@ -61,6 +61,20 @@ for i in range(len(games)*2):
 current_data.reset_index(drop=False, inplace=True)
 current_data = current_data[['mapping', 'team', 'owner', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]]
 
+# populate totals
+total_df = pd.DataFrame()
+for index, row in current_data.iterrows():
+    count = 0
+    for i in range(14):
+        if row[i] is not None:
+            count += 1
+    total_df = pd.concat([total_df, pd.DataFrame([[
+        row['mapping'],
+        count
+    ]], columns=['mapping', 'total'])])
+current_data = current_data.merge(total_df, how='left', on='mapping')
+
+# write to excel
 writer = pd.ExcelWriter(output_path, engine='xlsxwriter')
 current_data.to_excel(writer, index=False)
 writer.close()
