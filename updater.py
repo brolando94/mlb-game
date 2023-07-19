@@ -43,6 +43,14 @@ games = content.xpath("//div[@class='Scoreboard__Column flex-auto Scoreboard__Co
 
 for i in range(len(games)*2):
     try:
+        # need to check to make sure that the game actually finished.
+        # if you pull to early postponed games that have score will enter the game.
+        # on espn the game should go away from the previous day when it restarts the next day
+        # but this is a way to avoid that issue. Not clean but works
+        outcome = str(content.xpath(f"(//ul[@class='ScoreboardScoreCell__Competitors']/li)[{i + 1}]")[0].attrib)
+        if 'winner' not in outcome and 'loser' not in outcome:
+            continue
+
         mapping = content.xpath("(//ul[@class='ScoreboardScoreCell__Competitors']/li/div/div/a/div[@class="
                                 "'ScoreCell__TeamName ScoreCell__TeamName--shortDisplayName truncate db'])"
                                 f"[{i + 1}]/text()")[0]
