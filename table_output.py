@@ -12,7 +12,11 @@ To Do:
 import pandas as pd
 import numpy as np
 from os import path
-from datetime import date
+from datetime import date, timedelta
+from dotenv import load_dotenv
+from os import environ as env
+from pathlib import Path
+from emailer import send_email
 
 
 def zebra_stripe(data):
@@ -22,9 +26,21 @@ def zebra_stripe(data):
     return z
 
 
-# email information
-subject = f'MLB Game {date.today()}'
-receivers = ['caps1394@gmail.com']
+# environment variables
+load_dotenv(fr'{Path.home()}\vars.env')
+email = str(env.get('email'))
+email_credentials = {
+    "host": "smtp.gmail.com", "port": "465", "login": email,
+    'pwd': f"{env.get('email_pwd')}", "sender": email
+}
+
+# for email
+receivers = [email]
+
+yesterday = str(date.today() - timedelta(days=1))
+
+subject = f'MLB Game Through {yesterday}'
+
 
 # game files path
 file_path = path.dirname(path.abspath(__file__)) + '/game_files/current_game.xlsx'
@@ -67,3 +83,5 @@ html = f"""\
         """
 
 # send email
+send_email(credentials=email_credentials, subject=subject, body="See Attached", receivers=receivers,
+           attachment_paths=[file_path])
