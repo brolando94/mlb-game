@@ -35,11 +35,6 @@ email_credentials = {
 # how many days back you want to run. Ideally you set it to run everyday pulling yesterdays scores
 yesterday = str(date.today() - timedelta(days=1))
 
-# for email
-receivers = [
-    email
-]
-
 # game files path
 game_path = path.dirname(path.abspath(__file__)) + '/game_files/'
 output_path = (game_path + "current_game.xlsx")
