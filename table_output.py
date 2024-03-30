@@ -17,6 +17,7 @@ from dotenv import load_dotenv
 from os import environ as env
 from pathlib import Path
 from emailer import send_email
+import sys
 
 
 def zebra_stripe(data):
@@ -26,6 +27,13 @@ def zebra_stripe(data):
     return z
 
 
+if len(sys.argv) < 2:
+    exit("Pass in at least 1 Email Recipient")
+
+# for email
+receivers = list(sys.argv[1:])
+
+
 # environment variables
 load_dotenv(fr'{Path.home()}\vars.env')
 email = str(env.get('email'))
@@ -33,9 +41,6 @@ email_credentials = {
     "host": "smtp.gmail.com", "port": "465", "login": email,
     'pwd': f"{env.get('email_pwd')}", "sender": email
 }
-
-# for email
-receivers = [email]
 
 yesterday = str(date.today() - timedelta(days=1))
 
