@@ -21,8 +21,12 @@ from pathlib import Path
 from emailer import send_email
 
 # environment variables
-load_dotenv(fr'{Path.home()}\vars.env')
+if load_dotenv(r'vars\vars.env') is False:
+    with open(r'vars\vars.env', 'w') as file:
+        file.write("email=''\nemail_pwd=''\nerror_email=''")
+    exit('Failed to load environment vars. Fill out vars.env')
 email = str(env.get('email'))
+error_email = [(env.get('error_email'))]
 email_credentials = {
     "host": "smtp.gmail.com", "port": "465", "login": email,
     'pwd': f"{env.get('email_pwd')}", "sender": email
@@ -35,8 +39,6 @@ yesterday = str(date.today() - timedelta(days=1))
 receivers = [
     email
 ]
-subject = f"MLB Update Error"
-body = f"Failed to update {yesterday}"
 
 # game files path
 game_path = path.dirname(path.abspath(__file__)) + '/game_files/'
@@ -66,7 +68,10 @@ url = f"https://www.espn.com/mlb/scoreboard/_/date/{yesterday.replace('-', '')}"
 response = requests.get(url=url, headers=base_headers)
 if response.status_code != 200:
     print(f"Error on {yesterday}")
-    send_email(credentials=email_credentials, body=body, receivers=receivers, subject=subject)
+    subject = f"MLB Update Error"
+    body = f"Failed to update {yesterday}\n\t{response.status_code}"
+    send_email(credentials=email_credentials, body=body, receivers=error_email, subject=subject)
+    exit()
 content = html.fromstring(response.text)
 
 games = content.xpath("//div[@class='Scoreboard__Column flex-auto Scoreboard__Column--1 "

@@ -35,7 +35,10 @@ receivers = list(sys.argv[1:])
 
 
 # environment variables
-load_dotenv(fr'{Path.home()}\vars.env')
+if load_dotenv(r'vars\vars.env') is False:
+    with open(r'vars\vars.env', 'w') as file:
+        file.write("email=''\nemail_pwd=''\nerror_email=''")
+    exit('Failed to load environment vars. Fill out vars.env')
 email = str(env.get('email'))
 email_credentials = {
     "host": "smtp.gmail.com", "port": "465", "login": email,
