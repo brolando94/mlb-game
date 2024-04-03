@@ -21,6 +21,13 @@ import sys
 import re
 
 
+def zebra_stripe(data):
+    s = data.index % 2 != 0
+    s = pd.concat([pd.Series(s)] * data.shape[1], axis=1)  # 6 or the n of cols u have
+    z = pd.DataFrame(np.where(s, 'background-color:#D1D1D1', ''), index=data.index, columns=data.columns)
+    return z
+
+
 # environment variables
 if load_dotenv(r'vars\vars.env') is False:
     with open(r'vars\vars.env', 'w') as file:
@@ -57,6 +64,25 @@ file_path = path.dirname(path.abspath(__file__)) + '/game_files/current_game.xls
 
 if not path.exists(file_path):
     exit('No current game to email. Run Updater.py to get started')
+
+# format table
+current_game = pd.read_excel(file_path, dtype=str).replace({np.nan: None})
+
+current_game['total'] = current_game['total'].astype('int')
+
+current_game_style = current_game.style \
+    .apply(zebra_stripe, axis=None) \
+    .set_table_styles([{'selector': 'td',
+                        'props': 'border: 2px solid black; border-collapse: collapse'},
+                       {'selector': 'thead, th',
+                        'props': 'background-color: #D3D3D3; color: black; '
+                        'border-right: 2px solid black; '
+                        'border-collapse: collapse; '
+                        'padding: 20px'}
+                       ]) \
+    .set_properties(**{'padding': '20px', 'border': '2px solid black', 'border-collapse': 'collapse'})
+
+current_game_style.to_excel(file_path, index=False)
 
 # send email
 send_email(credentials=email_credentials, subject=subject, body="See Attached", receivers=receivers,
