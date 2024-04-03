@@ -23,10 +23,9 @@ from emailer import send_email
 # environment variables
 if load_dotenv(r'vars\vars.env') is False:
     with open(r'vars\vars.env', 'w') as file:
-        file.write("email=''\nemail_pwd=''\nerror_email=''")
+        file.write("email=''\nemail_pwd=''\nreceivers=''")
     exit('Failed to load environment vars. Fill out vars.env')
 email = str(env.get('email'))
-error_email = [(env.get('error_email'))]
 email_credentials = {
     "host": "smtp.gmail.com", "port": "465", "login": email,
     'pwd': f"{env.get('email_pwd')}", "sender": email
@@ -65,7 +64,7 @@ if response.status_code != 200:
     print(f"Error on {yesterday}")
     subject = f"MLB Update Error"
     body = f"Failed to update {yesterday}\n\t{response.status_code}"
-    send_email(credentials=email_credentials, body=body, receivers=error_email, subject=subject)
+    send_email(credentials=email_credentials, body=body, receivers=[email], subject=subject)
     exit()
 content = html.fromstring(response.text)
 
@@ -90,7 +89,7 @@ for i in range(len(games)*2):
 
     score = int(score)
     if 0 <= score < 14:
-        if current_data.loc[[mapping]][score][0] is None:
+        if current_data.loc[mapping][score] is None:
             current_data.at[f'{mapping}', score] = f"{yesterday[5:].replace('-', '/')}"
 
 current_data.reset_index(drop=False, inplace=True)
