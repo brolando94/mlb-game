@@ -41,9 +41,9 @@ def send_email(credentials: dict, subject: str, receivers: list,  body: str,
         return False
 
     msg = MIMEMultipart()
-    msg.add_header('From:', sender)
-    msg.add_header('To:', ",".join(receivers))
-    msg.add_header('Subject', f"{subject}")
+    msg['Subject'] = subject
+    msg['To'] = ",".join(receivers)
+    msg['From'] = sender
 
     # add attachments
     if attachment_paths is not None:
