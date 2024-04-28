@@ -97,11 +97,17 @@ current_data = current_data[['mapping', 'team', 'owner', 0, 1, 2, 3, 4, 5, 6, 7,
 
 # populate totals
 total_df = pd.DataFrame()
+winner = False
 for index, row in current_data.iterrows():
     count = 0
     for i in range(14):
         if row[i] is not None:
             count += 1
+
+    # winner detection
+    if count == 14:
+        winner = True
+
     total_df = pd.concat([total_df, pd.DataFrame([[
         row['mapping'],
         count
@@ -112,3 +118,6 @@ current_data = current_data.merge(total_df, how='left', on='mapping')
 writer = pd.ExcelWriter(output_path, engine='xlsxwriter')
 current_data.to_excel(writer, index=False)
 writer.close()
+# send winner email
+if winner:
+    send_email(credentials=email_credentials, receivers=[email], subject='Baseball Winner detected', body='')
