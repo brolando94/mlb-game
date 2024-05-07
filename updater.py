@@ -17,7 +17,6 @@ import numpy as np
 from os import path
 from dotenv import load_dotenv
 from os import environ as env
-from pathlib import Path
 from emailer import send_email
 
 # environment variables
@@ -72,10 +71,13 @@ games = content.xpath("//div[@class='Scoreboard__Column flex-auto Scoreboard__Co
                       "Scoreboard__Column--Score Scoreboard__Column--Score--baseball']")
 
 for i in range(len(games)*2):
-    # need to check to make sure that the game actually finished.
-    # if you pull to early postponed games that have score will enter the game.
-    # on espn the game should go away from the previous day when it restarts the next day
-    # but this is a way to avoid that issue. Not clean but works
+    """
+    Note:
+    need to check to make sure that the game actually finished.
+    if you pull to early postponed games that have score will enter the game.
+    on espn the game should go away from the previous day when it restarts the next day
+    but this is a way to avoid that issue. Not clean but works
+    """
     outcome = str(content.xpath(f"(//ul[@class='ScoreboardScoreCell__Competitors']/li)[{i + 1}]")[0].attrib)
     if 'winner' not in outcome and 'loser' not in outcome:
         continue
