@@ -12,7 +12,7 @@ Download the repository and load into your ide
 2. Navigate to mlb-game/vars/
 3. Open and fill out vars.env in a text editor
    Example:
-            email='example_sender@example.com'
+            \nemail='example_sender@example.com'
             email_pwd='example_password'
             receivers='example_receiver_1@example.com,example_receiver_2@example.com'
 4. Set updater.py to run daily
