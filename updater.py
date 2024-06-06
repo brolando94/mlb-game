@@ -15,33 +15,34 @@ from datetime import date, timedelta
 from lxml import html
 import numpy as np
 from os import path
-from dotenv import load_dotenv
+from dotenv import load_dotenv, set_key
 from os import environ as env
 from emailer import send_email
 
 # environment variables
 if load_dotenv(r'vars\vars.env') is False:
     with open(r'vars\vars.env', 'w') as file:
-        file.write("email=''\nemail_pwd=''\nreceivers=''")
+        file.write("email=''\nemail_pwd=''\nreceivers=''\nwinner_count='0'")
     exit('Failed to load environment vars. Fill out vars.env')
 email = str(env.get('email'))
 email_credentials = {
     "host": "smtp.gmail.com", "port": "465", "login": email,
     'pwd': f"{env.get('email_pwd')}", "sender": email
 }
+previous_winner_count = int(env.get('winner_count'))
 
 # how many days back you want to run. Ideally you set it to run everyday pulling yesterdays scores
 yesterday = str(date.today() - timedelta(days=1))
 
-# game files path
-game_path = path.dirname(path.abspath(__file__)) + '/game_files/'
-output_path = (game_path + "current_game.xlsx")
+# path to working files
+game_files_path = path.dirname(path.abspath(__file__)) + '/game_files/'
+output_path = (game_files_path + "current_game.xlsx")
 
 # check whether the game is new or in progress
 if path.exists(output_path):
     input_path = output_path
 else:
-    input_path = (game_path + "template.xlsx")
+    input_path = (game_files_path + "template.xlsx")
 
 current_data = pd.read_excel(input_path, dtype=str).replace({np.nan: None})
 
@@ -99,7 +100,7 @@ current_data = current_data[['mapping', 'team', 'owner', 0, 1, 2, 3, 4, 5, 6, 7,
 
 # populate totals
 total_df = pd.DataFrame()
-winner = False
+current_winner_count = 0
 for index, row in current_data.iterrows():
     count = 0
     for i in range(14):
@@ -108,7 +109,7 @@ for index, row in current_data.iterrows():
 
     # winner detection
     if count == 14:
-        winner = True
+        current_winner_count += 1
 
     total_df = pd.concat([total_df, pd.DataFrame([[
         row['mapping'],
@@ -120,6 +121,22 @@ current_data = current_data.merge(total_df, how='left', on='mapping')
 writer = pd.ExcelWriter(output_path, engine='xlsxwriter')
 current_data.to_excel(writer, index=False)
 writer.close()
+
 # send winner email
-if winner:
-    send_email(credentials=email_credentials, receivers=[email], subject='Baseball Winner detected', body='')
+if current_winner_count > previous_winner_count:
+    # update winner count in env file
+    set_key(r'vars\vars.env', 'winner_count', f'{current_winner_count}')
+    send_email(credentials=email_credentials, receivers=[email], subject='Baseball Winner detected',
+               body=f'Winner Count: {current_winner_count}')
+
+# might need to reset the winner count in the env file
+elif current_winner_count < previous_winner_count:
+    set_key(r'vars\vars.env', 'winner_count', f'{current_winner_count}')
+
+# write to completion log for quick validation later
+if path.exists(r'logs\completion_log.txt'):
+    with open(r'logs\completion_log.txt', 'a') as file:
+        file.write(f"\n{yesterday}")
+else:
+    with open(r'logs\completion_log.txt', 'w') as file:
+        file.write(f"Dates: \n{yesterday}")

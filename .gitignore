@@ -152,3 +152,4 @@ cython_debug/
 .idea/
 attachments/
 current_game.xlsx
+*.txt

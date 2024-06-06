@@ -31,7 +31,7 @@ def zebra_stripe(data):
 # environment variables
 if load_dotenv(r'vars\vars.env') is False:
     with open(r'vars\vars.env', 'w') as file:
-        file.write("email=''\nemail_pwd=''\nreceivers=''")
+        file.write("email=''\nemail_pwd=''\nreceivers=''\nwinner_count='0'")
     exit('Failed to load environment vars. Fill out vars.env')
 
 # for email
